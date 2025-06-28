@@ -8,7 +8,7 @@ import TableMahasiswa from "@/Pages/Admin/Mahasiswa/TableMahasiswa";
 
 // Import custom hooks
 // DI SINI LETAK PERBAIKANNYA:
-import { useDebounce } from "@/Utils/Hooks/useDebounce";
+
 import { useMahasiswa, useStoreMahasiswa, useUpdateMahasiswa, useDeleteMahasiswa } from "@/Utils/Hooks/useMahasiswa";
 import { useKelas } from "@/Utils/Hooks/useKelas";
 import { useMataKuliah } from "@/Utils/Hooks/useMataKuliah";
