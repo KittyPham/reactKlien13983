@@ -7,6 +7,7 @@ import ModalMahasiswa from "@/Pages/Admin/Mahasiswa/ModalMahasiswa";
 import TableMahasiswa from "@/Pages/Admin/Mahasiswa/TableMahasiswa";
 
 // Import custom hooks
+import { useDebounce } from "@/Utils/Hooks/useDebounce";
 import { useMahasiswa, useStoreMahasiswa, useUpdateMahasiswa, useDeleteMahasiswa } from "@/Utils/Hooks/useMahasiswa";
 import { useKelas } from "@/Utils/Hooks/useKelas";
 import { useMataKuliah } from "@/Utils/Hooks/useMataKuliah";
@@ -34,7 +35,7 @@ const Mahasiswa = () => {
   const { data: kelas = [] } = useKelas();
   const { data: mataKuliah = [] } = useMataKuliah();
 
-  // Hook mutasi (tidak berubah)
+  // Hook mutasi (akan berfungsi di lokal, tidak di Vercel Static)
   const { mutate: store } = useStoreMahasiswa();
   const { mutate: update } = useUpdateMahasiswa();
   const { mutate: remove } = useDeleteMahasiswa();
@@ -61,7 +62,7 @@ const Mahasiswa = () => {
     return processedMahasiswa.slice(start, end);
   }, [processedMahasiswa, page, perPage]);
 
-  // State dan fungsi lain (tidak berubah)
+  // State dan fungsi lain
   const [form, setForm] = useState({ id: "", nim: "", name: "", max_sks: 0 });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -74,23 +75,52 @@ const Mahasiswa = () => {
     [kelas, mataKuliahMap]
   );
 
+  // FUNGSI-FUNGSI YANG SUDAH DIISI LENGKAP
   const resetFormAndCloseModal = () => {
-    /* ... logika tetap sama ... */
+    setForm({ id: "", nim: "", name: "", max_sks: 0 });
+    setIsModalOpen(false);
+    setIsEdit(false);
   };
+
   const handleChange = (e) => {
-    /* ... logika tetap sama ... */
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
+
   const openAddModal = () => {
-    /* ... logika tetap sama ... */
+    resetFormAndCloseModal();
+    setIsModalOpen(true);
   };
+
   const openEditModal = (mhs) => {
-    /* ... logika tetap sama ... */
+    setForm({ id: mhs.id, nim: mhs.nim, name: mhs.name, max_sks: mhs.max_sks });
+    setIsEdit(true);
+    setIsModalOpen(true);
   };
+
   const handleSubmit = (e) => {
-    /* ... logika tetap sama, tapi ingat ini hanya berfungsi di lokal ... */
+    e.preventDefault();
+    if (!form.nim || !form.name || !form.max_sks) {
+      toastError("NIM, Nama, dan Max SKS wajib diisi");
+      return;
+    }
+    const payload = { nim: form.nim, name: form.name, max_sks: Number(form.max_sks) };
+    if (isEdit) {
+      confirmUpdate(() => {
+        update({ id: form.id, data: payload });
+        resetFormAndCloseModal();
+      });
+    } else {
+      if (semuaMahasiswa.find((m) => m.nim === form.nim)) {
+        toastError("NIM sudah terdaftar!");
+        return;
+      }
+      store(payload);
+      resetFormAndCloseModal();
+    }
   };
+
   const handleDelete = (id) => {
-    /* ... logika tetap sama, tapi ingat ini hanya berfungsi di lokal ... */
+    confirmDelete(() => remove(id));
   };
 
   const handlePrev = () => setPage((prev) => Math.max(prev - 1, 1));
@@ -98,10 +128,11 @@ const Mahasiswa = () => {
     if (page < totalPages) setPage((prev) => prev + 1);
   };
 
-  // Efek untuk reset halaman jika hasil filter lebih sedikit dari halaman saat ini
   useEffect(() => {
     if (page > totalPages && totalPages > 0) {
       setPage(totalPages);
+    } else if (totalPages === 0 && page !== 1) {
+      setPage(1);
     }
   }, [totalPages, page]);
 
@@ -111,7 +142,7 @@ const Mahasiswa = () => {
         <Heading as="h2" className="mb-0 text-left">
           Daftar Mahasiswa
         </Heading>
-        <Button onClick={openAddModal}>+ Tambah</Button>
+        {user.permission.includes("mahasiswa.create") && <Button onClick={openAddModal}>+ Tambah</Button>}
       </div>
 
       <div className="flex flex-wrap gap-2 mb-4">
