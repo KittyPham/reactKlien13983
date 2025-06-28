@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "api/index.cjs": {
+      "includeFiles": "db/**"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api"
+    }
+  ]
+}

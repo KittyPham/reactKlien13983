@@ -1,0 +1,7 @@
+[
+  { "id": "1", "name": "Slamet", "max_sks": 12 },
+  { "id": "2", "name": "Tini", "max_sks": 10 },
+  { "id": "3", "name": "Udin", "max_sks": 14 },
+  { "id": "4", "name": "Vina", "max_sks": 16 },
+  { "id": "5", "name": "Wawan", "max_sks": 8 }
+]
