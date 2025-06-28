@@ -1,4 +1,3 @@
-// ChartApi.jsx
 import axios from "@/Utils/AxiosInstance";
-
-export const getAllChartData = () => axios.get("/chart");
+// DIUBAH: Panggil file .json secara langsung
+export const getAllChartData = () => axios.get("/chart.json");

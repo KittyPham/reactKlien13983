@@ -1,7 +1,5 @@
 import axios from "@/Utils/AxiosInstance";
-
-// Ambil semua mata kuliah
-export const getAllMataKuliah = () => axios.get("/mata_kuliah");
+export const getAllMataKuliah = () => axios.get("/mata_kuliah.json");
 
 // Ambil satu mata kuliah
 export const getMataKuliah = (id) => axios.get(`/mata_kuliah/${id}`);

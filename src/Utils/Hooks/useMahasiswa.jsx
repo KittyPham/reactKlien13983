@@ -1,20 +1,26 @@
+// src/Utils/Hooks/useMahasiswa.jsx (Versi Diperbarui untuk Vercel Static)
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getAllMahasiswa, storeMahasiswa, updateMahasiswa, deleteMahasiswa } from "@/Utils/Apis/MahasiswaApi";
+// Pastikan fungsi API yang diimpor sudah diubah untuk memanggil .json
+import { getAllMahasiswa, storeMahasiswa, updateMahasiswa, deleteMahasiswa } from "@/Utils/Apis/MahasiswaApi.jsx";
 import { toastSuccess, toastError } from "@/Utils/Helpers/ToastHelpers";
 
-export const useMahasiswa = (query = {}) =>
+// DIUBAH: Hook ini tidak lagi menerima parameter 'query'.
+export const useMahasiswa = () =>
   useQuery({
-    queryKey: ["mahasiswa", query],
+    // DIUBAH: Query key sekarang statis karena kita selalu fetch data yang sama.
+    queryKey: ["mahasiswa"],
 
-    queryFn: () => getAllMahasiswa(query),
+    // DIUBAH: Panggil getAllMahasiswa tanpa parameter.
+    queryFn: getAllMahasiswa,
 
-    select: (res) => ({
-      data: res?.data ?? [],
-      total: parseInt(res.headers["x-total-count"] ?? "0", 10),
-    }),
-
-    keepPreviousData: true,
+    // DIUBAH: Kembalikan langsung array datanya. Tidak ada lagi 'total' dari header.
+    select: (res) => res?.data ?? [],
   });
+
+// --- Hook Mutasi (Tidak Perlu Diubah) ---
+// Hook ini akan tetap berfungsi saat development lokal dengan `npm run serve`.
+// Saat di-deploy di Vercel, mereka akan gagal karena tidak ada server untuk memproses POST/PUT/DELETE, dan itu normal untuk metode ini.
 
 export const useStoreMahasiswa = () => {
   const queryClient = useQueryClient();
