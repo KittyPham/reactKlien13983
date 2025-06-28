@@ -1,29 +1,34 @@
+// Lokasi: /api/index.cjs (Ganti dengan kode baru ini)
 const jsonServer = require("json-server");
-const path = require("path");
-const fs = require("fs");
 
-const createDbObject = () => {
-  const dbDir = path.resolve(__dirname, "..", "db");
-  const outputDb = {};
-  try {
-    const files = fs.readdirSync(dbDir);
-    files.forEach((file) => {
-      if (file.endsWith(".json")) {
-        const filePath = path.join(dbDir, file);
-        const key = path.basename(file, ".json"); // Ini sudah benar
-        const content = fs.readFileSync(filePath, "utf-8");
-        outputDb[key] = JSON.parse(content);
-      }
-    });
-  } catch (error) {
-    console.error("Gagal membaca direktori 'db':", error);
-  }
-  return outputDb;
-};
-
+// Buat servernya
 const server = jsonServer.create();
-const router = jsonServer.router(createDbObject());
+
+// Buat database langsung di dalam kode (hardcoded)
+// Ini menghilangkan kebutuhan untuk membaca file dari folder /db
+const router = jsonServer.router({
+  // Kita hanya akan tes endpoint 'user' untuk login
+  user: [
+    {
+      id: 1,
+      name: "Admin 1",
+      email: "admin@gmail.com",
+      password: "admin123",
+      role: "admin",
+      permission: ["dashboard.page", "mahasiswa.page", "rencana-studi.page"],
+    },
+  ],
+  // Tambahkan endpoint lain dengan data kosong agar tidak error 404 nanti
+  mahasiswa: [],
+  kelas: [],
+  mata_kuliah: [],
+  chart: {},
+});
+
 const middlewares = jsonServer.defaults();
+
 server.use(middlewares);
 server.use(router);
+
+// Export server agar Vercel bisa menjalankannya
 module.exports = server;
